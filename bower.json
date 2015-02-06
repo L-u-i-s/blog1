@@ -1,0 +1,30 @@
+{
+  "name": "static-site",
+  "version": "0.1.0",
+  "authors": [
+    "Luis <luisdaniel.240395@gmail.com>"
+  ],
+  "description": "practice1",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "IESO",
+    "static",
+    "site",
+    "practice1",
+    "projects"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.2"
+  }
+}
