@@ -1,33 +1,51 @@
 <?php
-    #Include the vendors autoload
-    require("../vendor/autoload.php");
-    
-    # instantiates a new Slim Application
-    $app = new \Slim\Slim(
-        array(
-            #Adds application settings
-            'view' => new \Slim\Views\Blade(),
-            'templates.path' => '../templates',
-        )
-    );    
-    
-    #setup templates compiled cache
-    $view = $app->view();
-    $view->parserOptions = array(
-        'debug' => true,
-        'cache' => '../html_cache'
-    );    
-    
-    # defines a route for the GET method
-    $app->get("/", function() use ($app){ 
-        $app->render(
-            'index',
-            array(
-                'title' => 'This is title variable',
-                'HeroUnit' => 'Welcome to my Todo App!!'
-            )    
-        );    
-    });
-    
-    #Actually runs the Application
-    $app->run();
+	# Include the vendors autoload
+	require("../vendor/autoload.php");
+	# Configures Idiorm ORM to use SQLite
+	ORM::configure('sqlite:../app.sqlite.db');
+	ORM::configure('logging', true);
+	//ORM::configure('return_result_sets', true);
+	# instantiates a new Slim Application
+	$app = new \Slim\Slim([
+		#Adds application settings
+		'view' => new \Slim\Views\Blade(),
+		'templates.path' => '../templates',
+	]);
+	#setup templates compiled cache
+	$view = $app->view();
+	$view->parserOptions = [
+		'debug' => true,
+		'cache' => "../html_cache"
+	];
+	# defines a route for the GET method
+	$app->get("/todos", function() use ($app){
+		$todos = ORM::forTable('todos')
+		->select(array('todos.id', 'todos.task', 'lookup.value'))
+		->join('lookup', ['todos.status', '=', 'lookup.code'])
+		//->where(['lookup.type' => 'todo.status'])
+		->findMany();
+		$app->render('todos.index', compact('todos', 'app'));
+		//var_dump(ORM::get_query_log(), $todos);
+	})->name('todos.index');
+	# defines a route for the GET method
+	/*$app->get("/todos/:id", function($id) use ($app){
+		$todo = ORM::forTable('todos')->findOne($id);
+		$app->render('todos.show', compact('todo'));
+	});*/
+	# defines a route for the GET method
+	$app->get("/todos/:id/update/status/:status", function($id, $status) use ($app){
+		# We get the status code firts the status code they passed
+		$status = ORM::forTable('lookup')->where(['type' => 'todo.status', 'value' => $status])->findOne();
+		# Then we get the corresponding todo item for the id
+		$todo = ORM::forTable('todos')->findOne($id);
+		# We update its code value		//$todo->status = $status->code;
+		$todo->set('status', $status->code);
+		# We save it into the database
+		$todo->save();
+		//var_dump(ORM::get_query_log());
+		$app->redirect('/todos');
+	})
+	->conditions(['status' => '(new|working|done|archived)'])
+	->name('todo.update');
+	# Actually runs the application
+	$app->run();

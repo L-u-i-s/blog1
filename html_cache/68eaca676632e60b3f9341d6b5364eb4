@@ -1,0 +1,30 @@
+
+<?php $__env->startSection('content'); ?>
+	<div class="container">
+		<div class="row">
+			<div class="jumbotron">
+				<h1 class="text-center">Todo App List</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+				<?php echo $__env->make('todos._form', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+			</div>
+			<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+				<ul class="list-group">
+					<?php if(!empty($todos)): ?>
+						<?php foreach($todos as $todo): ?>
+							<?php echo $__env->make('todos._item', compact('todo'), array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<p>Your todos list is empty, create a new todo item with the side form.</p>
+					<?php endif; ?>
+				</ul>
+			</div>
+			<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+			<?php /*	<?php echo $__env->make('widgets.social', compact('todo'), array_except(get_defined_vars(), array('__data', '__path')))->render(); ?> */ ?>
+			</div>
+		</div>
+	</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.main', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
